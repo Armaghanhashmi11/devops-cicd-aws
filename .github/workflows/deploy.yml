@@ -21,7 +21,25 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init & Apply
+        id: terraform
         run: |
           cd terraform
-          terraform init 
+          terraform init
           terraform apply -auto-approve
+          echo "instance_ip=$(terraform output -raw server_public_ip)" >> $GITHUB_ENV
+
+      # This is the NEW part that makes it a Docker project
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t my-devops-app .
+          # In a real project, you'd push to Docker Hub here. 
+          # For now, we will verify the build works in the pipeline.
+
+      - name: Deploy App to EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.instance_ip }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo docker run -d -p 80:80 nginx
