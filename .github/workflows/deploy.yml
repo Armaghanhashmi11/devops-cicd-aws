@@ -40,6 +40,17 @@ jobs:
           # For this stage, just knowing the IP is a huge win!
           echo "Server is ready at ${{ env.instance_ip }}"
 
+      - name: Verify SSH private key secret
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          # Fail early and safely if the SSH secret is missing or empty
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo "ERROR: SSH_PRIVATE_KEY secret is empty" >&2
+            exit 1
+          fi
+          echo "SSH_PRIVATE_KEY length: ${#SSH_PRIVATE_KEY}"
+
       - name: Deploy App to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.6
         with:

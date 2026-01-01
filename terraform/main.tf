@@ -29,11 +29,27 @@ resource "aws_security_group" "docker_sg" {
   }
 }
 
-# 2. EC2 Instance (Using the AMI from your screenshot)
+# 2a. Generate an SSH keypair and register it with AWS
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "tls_private_key" "deployer" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = "deployer-key-${random_id.suffix.hex}"
+  public_key = tls_private_key.deployer.public_key_openssh
+}
+
+# 2b. EC2 Instance (Using the AMI from your screenshot)
 resource "aws_instance" "devops_server" {
   ami           = "ami-0ecb62995f68bb549" # The Free Tier AMI you found
   instance_type = "t3.micro"
   vpc_security_group_ids = [aws_security_group.docker_sg.id]
+  key_name = aws_key_pair.deployer.key_name
 
   user_data = <<-EOF
               #!/bin/bash
@@ -46,6 +62,12 @@ resource "aws_instance" "devops_server" {
   tags = {
     Name = "DevOps-Docker-Server"
   }
+}
+
+# Sensitive output: private key for adding to GitHub Secrets (keep secure!)
+output "private_ssh_key_pem" {
+  value     = tls_private_key.deployer.private_key_pem
+  sensitive = true
 }
 
 # 3. Output the IP (Required for the GitHub Action to work)
