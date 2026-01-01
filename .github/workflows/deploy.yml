@@ -26,8 +26,8 @@ jobs:
           cd terraform
           terraform init
           terraform apply -auto-approve
-          # We add -no-color to keep the output clean for GitHub
-          IP=$(terraform output -raw server_public_ip)
+          # The '-raw' and '-no-color' flags ensure no debug text is added
+          IP=$(terraform output -raw -no-color server_public_ip)
           echo "instance_ip=$IP" >> $GITHUB_ENV
 
       # This is the NEW part that makes it a Docker project
