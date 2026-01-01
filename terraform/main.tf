@@ -2,9 +2,9 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# 1. Create a Security Group
+# 1. Security Group (Name changed to v3 to avoid the 'Duplicate' error)
 resource "aws_security_group" "docker_sg" {
-  name        = "docker-server-sg-v2"
+  name        = "docker-server-sg-v3" 
   description = "Allow HTTP and SSH"
 
   ingress {
@@ -29,9 +29,9 @@ resource "aws_security_group" "docker_sg" {
   }
 }
 
-# 2. Create the EC2 Instance (Using t3.micro for 2026 Free Tier)
+# 2. EC2 Instance (Using the AMI from your screenshot)
 resource "aws_instance" "devops_server" {
-  ami           = "ami-0e2c8ccd4e1ffc351" # Ubuntu 24.04 LTS for us-east-1
+  ami           = "ami-0ecb62995f68bb549" # The Free Tier AMI you found
   instance_type = "t3.micro"
   vpc_security_group_ids = [aws_security_group.docker_sg.id]
 
@@ -48,7 +48,7 @@ resource "aws_instance" "devops_server" {
   }
 }
 
-# 3. Output the Public IP so we can find it easily
+# 3. Output the IP (Required for the GitHub Action to work)
 output "server_public_ip" {
   value = aws_instance.devops_server.public_ip
 }
