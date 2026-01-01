@@ -44,4 +44,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo docker run -d -p 80:80 nginx
+            sudo docker run -d -p 80:80 nginx 
