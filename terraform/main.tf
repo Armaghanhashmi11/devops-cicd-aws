@@ -4,7 +4,7 @@ provider "aws" {
 
 # 1. Create a Security Group
 resource "aws_security_group" "docker_sg" {
-  name        = "docker-server-sg"
+  name        = "docker-server-sg-v2"
   description = "Allow HTTP and SSH"
 
   ingress {
