@@ -113,4 +113,3 @@ sudo cat /var/log/cloud-init-output.log
 
 ---
 
-If you want, I can add a short `USAGE.md` with exact commands for retrieving the Terraform-generated key and creating the GitHub secret using the `gh` CLI. ✅
