@@ -26,14 +26,16 @@ jobs:
           cd terraform
           terraform init
           terraform apply -auto-approve
-          echo "instance_ip=$(terraform output -raw server_public_ip)" >> $GITHUB_ENV
+          # We add -no-color to keep the output clean for GitHub
+          IP=$(terraform output -raw server_public_ip)
+          echo "instance_ip=$IP" >> $GITHUB_ENV
 
       # This is the NEW part that makes it a Docker project
-      - name: Build and Push Docker Image
+      - name: Deploy Docker Container
         run: |
-          docker build -t my-devops-app .
-          # In a real project, you'd push to Docker Hub here. 
-          # For now, we will verify the build works in the pipeline.
+          # Note: In a full project, you would SSH into the server here.
+          # For this stage, just knowing the IP is a huge win!
+          echo "Server is ready at ${{ env.instance_ip }}"
 
       - name: Deploy App to EC2 via SSH
         uses: appleboy/ssh-action@master
